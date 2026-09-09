@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kids Typing Master</title>
+    <title>Kids Magic Typing Master</title>
     <style>
         * {
             box-sizing: border-box;
@@ -12,7 +12,7 @@
             font-family: 'Comic Sans MS', cursive, sans-serif;
         }
         body {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -23,8 +23,8 @@
         h1 {
             color: #fff;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
-            font-size: 2.5rem;
+            margin-bottom: 15px;
+            font-size: 2.2rem;
         }
         .screen {
             width: 85vw;
@@ -33,81 +33,138 @@
             border-radius: 30px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             border: 8px solid #ff6b6b;
             position: relative;
         }
         #output {
-            font-size: 15rem;
+            font-size: 8rem;
             font-weight: bold;
-            color: #4ecdc4;
-            text-shadow: 4px 4px 0px #ff6b6b;
-            text-align: center;
+            color: #ff6b6b;
             text-transform: uppercase;
+            line-height: 1;
+        }
+        #subtext {
+            font-size: 2.5rem;
+            color: #4ecdc4;
+            margin-top: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+        #visual-scratch {
+            font-size: 3.5rem;
+            margin-top: 15px;
+            letter-spacing: 10px;
         }
         .instruction {
-            margin-top: 25px;
-            font-size: 1.8rem;
-            color: #ffffff;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 10px 30px;
+            margin-top: 20px;
+            font-size: 1.5rem;
+            color: #333;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 8px 25px;
             border-radius: 50px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
 
-    <h1>🎈 Bachcho ka Typing Master 🎈</h1>
+    <h1>🎈 Bachcho ka Magic Typing Master 🎈</h1>
 
     <div class="screen">
         <div id="output">ABC</div>
+        <div id="subtext">Press any key!</div>
+        <div id="visual-scratch">🍎</div>
     </div>
 
     <div class="instruction">Keyboard par koi bhi button dabayein! ⌨️</div>
 
     <script>
         const output = document.getElementById('output');
+        const subtext = document.getElementById('subtext');
+        const visualScratch = document.getElementById('visual-scratch');
 
-        // आवाज़ (Speech Synthesis) के लिए फंक्शन
+        // एबीसीडी (A for Apple) और नंबर्स का डेटा
+        const kidsData = {
+            'a': { text: 'A for Apple', emoji: '🍎', speak: 'A for Apple' },
+            'b': { text: 'B for Ball', emoji: '⚽', speak: 'B for Ball' },
+            'c': { text: 'C for Cat', emoji: '🐱', speak: 'C for Cat' },
+            'd': { text: 'D for Dog', emoji: '🐶', speak: 'D for Dog' },
+            'e': { text: 'E for Elephant', emoji: '🐘', speak: 'E for Elephant' },
+            'f': { text: 'F for Fish', emoji: '🐟', speak: 'F for Fish' },
+            'g': { text: 'G for Grapes', emoji: '🍇', speak: 'G for Grapes' },
+            'h': { text: 'H for Horse', emoji: '🐴', speak: 'H for Horse' },
+            'i': { text: 'I for Ice Cream', emoji: '🍦', speak: 'I for Ice Cream' },
+            'j': { text: 'J for Jug', emoji: '🏺', speak: 'J for Jug' },
+            'k': { text: 'K for Kite', emoji: '🪁', speak: 'K for Kite' },
+            'l': { text: 'L for Lion', emoji: '🦁', speak: 'L for Lion' },
+            'm': { text: 'M for Monkey', emoji: '🐵', speak: 'M for Monkey' },
+            'n': { text: 'N for Nest', emoji: '🪹', speak: 'N for Nest' },
+            'o': { text: 'O for Owl', emoji: '🦉', speak: 'O for Owl' },
+            'p': { text: 'P for Parrot', emoji: '🦜', speak: 'P for Parrot' },
+            'q': { text: 'Q for Queen', emoji: '👑', speak: 'Q for Queen' },
+            'r': { text: 'R for Rose', emoji: '🌹', speak: 'R for Rose' },
+            's': { text: 'S for Sun', emoji: '☀️', speak: 'S for Sun' },
+            't': { text: 'T for Train', emoji: '🚂', speak: 'T for Train' },
+            'u': { text: 'U for Umbrella', emoji: '☂️', speak: 'U for Umbrella' },
+            'v': { text: 'V for Van', emoji: '🚐', speak: 'V for Van' },
+            'w': { text: 'W for Watch', emoji: '⌚', speak: 'W for Watch' },
+            'x': { text: 'X for Xylophone', emoji: '🪘', speak: 'X for Xylophone' },
+            'y': { text: 'Y for Yak', emoji: '🐂', speak: 'Y for Yak' },
+            'z': { text: 'Z for Zebra', emoji: '🦓', speak: 'Z for Zebra' }
+        };
+
         function speakText(text) {
             if ('speechSynthesis' in window) {
-                // अगर पहले से कोई आवाज़ बोल रही हो तो उसे रोकें
                 window.speechSynthesis.cancel();
-                
                 let utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-US'; // अक्षर साफ़ बोलने के लिए
-                utterance.rate = 0.8; // गति थोड़ी धीमी ताकि बच्चा आसानी से समझ सके
+                utterance.lang = 'en-US';
+                utterance.rate = 0.8;
                 window.speechSynthesis.speak(utterance);
             }
         }
 
-        // कीबोर्ड की बटन दबाने पर क्या होगा
         window.addEventListener('keydown', function(event) {
-            let key = event.key;
+            let key = event.key.toLowerCase();
 
-            // स्पेसबार या अन्य विशेष कुंजियों के लिए सुंदर टेक्स्ट दिखाना
-            if (key === ' ') {
-                output.innerText = "SPACE";
-                speakText("Space");
-            } else if (event.key.length === 1) {
-                // सिर्फ साधारण अक्षरों और अंकों के लिए
+            // अगर कोई अल्फाबेट दबाया (a to z)
+            if (kidsData[key]) {
+                let data = kidsData[key];
+                output.innerText = key.toUpperCase();
+                subtext.innerText = data.text;
+                visualScratch.innerText = data.emoji;
+                speakText(data.speak);
+            } 
+            // अगर कोई डिजिट (0 to 9) दबाया
+            else if (!isNaN(key) && key !== " ") {
+                let num = parseInt(key);
                 output.innerText = key;
-                speakText(key);
-            } else {
-                // अन्य बड़ी कुंजियाँ (जैसे Enter, Shift आदि)
-                output.innerText = key;
-                speakText(key);
+                subtext.innerText = `Number ${num}`;
+                // अंक के हिसाब से उतने स्टार या बैलून दिखाएं (अगर 0 है तो एक भी नहीं या विशेष स्माइली)
+                if(num === 0) {
+                    visualScratch.innerText = "⭐ (Zero)";
+                } else {
+                    visualScratch.innerText = "⭐".repeat(num);
+                }
+                speakText(`Number ${num}`);
+            } 
+            // अन्य कुंजियाँ (जैसे Space या Enter)
+            else {
+                output.innerText = event.key.toUpperCase();
+                subtext.innerText = "Special Key";
+                visualScratch.innerText = "✨";
+                speakText(event.key);
             }
 
-            // हल्का सा रंग बदलने का इफ़ेक्ट (Animation)
-            output.style.transform = "scale(1.2)";
+            // स्क्रीन पर छोटा सा एनिमेशन इफ़ेक्ट
+            let screenBox = document.querySelector('.screen');
+            screenBox.style.transform = "scale(1.03)";
             setTimeout(() => {
-                output.style.transform = "scale(1)";
+                screenBox.style.transform = "scale(1)";
             }, 150);
         });
     </script>
-
 </body>
 </html>
